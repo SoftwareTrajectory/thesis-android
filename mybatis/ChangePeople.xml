@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softwaretrajectory.persistence">
+
+ <select id="getPeople" resultType="com.softwaretrajectory.persistence.ChangePeople">
+  SELECT * FROM change_people
+ </select>
+
+ <select id="getPeopleByName" resultType="com.softwaretrajectory.persistence.ChangePeople"
+  parameterType="String">
+  SELECT * FROM change_people
+  WHERE name = #{value}
+ </select>
+
+ <select id="getPeopleByEmail" resultType="com.softwaretrajectory.persistence.ChangePeople"
+  parameterType="String">
+  SELECT * FROM change_people
+  WHERE email = #{value}
+ </select>
+
+ <select id="getPeopleForId" resultType="com.softwaretrajectory.persistence.ChangePeople"
+  parameterType="Integer">
+  SELECT * FROM change_people
+  WHERE id = #{value}
+ </select>
+
+ <insert id="saveUser" parameterType="com.softwaretrajectory.persistence.ChangePeople"
+  useGeneratedKeys="true" keyProperty="id">
+  INSERT INTO
+  change_people (name, email)
+  VALUES (#{name},
+  #{email})
+ </insert>
+
+</mapper>

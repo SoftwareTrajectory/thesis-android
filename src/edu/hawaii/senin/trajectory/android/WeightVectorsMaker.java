@@ -65,7 +65,7 @@ public class WeightVectorsMaker {
       HashMap<String, int[]> postArrays = dataPostRelease.get(rr.getId()).get("post");
       consoleLogger.info("  post-release arrays: " + postArrays.size());
       WordBag wb2 = new WordBag("post-" + rr.getId());
-      for (Entry<String, int[]> e : preArrays.entrySet()) {
+      for (Entry<String, int[]> e : postArrays.entrySet()) {
         String word = toSAX(toDoubles(e.getValue()), 7, 4, 3);
         wb2.addWord(word);
       }

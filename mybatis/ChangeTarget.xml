@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softwaretrajectory.persistence">
+
+ <select id="getTargets" resultType="com.softwaretrajectory.persistence.ChangeTarget">
+  SELECT * FROM change_target
+  WHERE change_id=#{value}
+ </select>
+
+ <select id="getChangeTarget" resultType="com.softwaretrajectory.persistence.ChangeTarget"
+  parameterType="com.softwaretrajectory.persistence.ChangeTarget">
+  SELECT * FROM change_target
+  WHERE change_id=#{change_id} AND target=#{target}
+ </select>
+
+ <update id="updateTarget" parameterType="com.softwaretrajectory.persistence.ChangeTarget">
+  UPDATE change_target SET
+  added=#{added},
+  edited=#{edited}, deleted=#{deleted},
+  renamed=#{renamed}, copied=#{copied},
+  added_lines=#{added_lines},
+  edited_lines=#{edited_lines},
+  deleted_lines=#{deleted_lines}
+  WHERE
+  change_id=#{change_id} AND target=#{target}
+ </update>
+
+
+ <insert id="saveTarget" parameterType="com.softwaretrajectory.persistence.ChangeTarget">
+  REPLACE INTO
+  change_target (change_id,
+  target,
+  added, edited, deleted, renamed,
+  copied, added_lines, edited_lines,
+  deleted_lines)
+  VALUES
+  (#{change_id},
+  #{target}, #{added}, #{edited}, #{deleted}, #{renamed}, #{copied},
+  #{added_lines},
+  #{edited_lines}, #{deleted_lines})
+ </insert>
+
+</mapper>

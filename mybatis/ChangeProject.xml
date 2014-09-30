@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softwaretrajectory.persistence">
+
+ <select id="getProjectById" resultType="com.softwaretrajectory.persistence.ChangeProject"
+  parameterType="Integer">
+  SELECT * FROM change_project WHERE id = #{value}
+ </select>
+
+ <select id="getProjectByName" resultType="com.softwaretrajectory.persistence.ChangeProject"
+  parameterType="String">
+  SELECT * FROM change_project WHERE name = #{name}
+ </select>
+
+ <select id="getProjects" resultType="com.softwaretrajectory.persistence.ChangeProject">
+  SELECT * FROM change_project ORDER BY name
+ </select>
+
+ <insert id="saveProject" parameterType="com.softwaretrajectory.persistence.ChangeProject"
+  useGeneratedKeys="true" keyProperty="id">
+  INSERT INTO
+  change_project (name,
+  local_path, retrieved)
+  VALUES
+  (#{name},
+  #{local_path}, #{retrieved})
+  ON
+  DUPLICATE KEY UPDATE local_path=#{local_path},
+  retrieved=#{retrieved}
+ </insert>
+
+</mapper>

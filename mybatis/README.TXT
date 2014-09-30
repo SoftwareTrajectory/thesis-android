@@ -1,0 +1,1 @@
+This folder contains all the XML definitions needed for the iBATIS mapper.

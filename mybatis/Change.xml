@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softwaretrajectory.persistence">
+
+ <select id="getChangeForId" resultType="com.softwaretrajectory.persistence.Change">
+  SELECT * FROM `change`
+  WHERE id=#{value}
+ </select>
+
+ <select id="getAuthorsForInterval" resultType="com.softwaretrajectory.persistence.ChangePeople" parameterType="HashMap">
+  SELECT cp.* FROM change_people cp where cp.id IN
+  (select distinct(c.author_id) from `change` c where c.author_date BETWEEN 
+   #{start,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  AND
+  #{end,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+)
+ </select>
+
+
+ <select id="getChange" resultType="com.softwaretrajectory.persistence.Change" parameterType="HashMap">
+  SELECT * FROM `change`
+  WHERE commit_hash=#{commit_hash}
+  AND project_id = #{project_id}
+ </select>
+
+ <select id="getFirstChangeForAuthor" resultType="com.softwaretrajectory.persistence.Change"
+  parameterType="HashMap">
+  SELECT * FROM `change`
+  WHERE author_id=#{author_id}
+  <if test="project_id !=null ">
+   AND project_id=#{project_id}
+  </if>
+  AND author_date IS NOT NULL
+  ORDER BY author_date LIMIT 1
+ </select>
+
+ <select id="getLastChangeForAuthor" resultType="com.softwaretrajectory.persistence.Change"
+  parameterType="HashMap">
+  SELECT * FROM `change`
+  WHERE author_id=#{author_id}
+  <if test="project_id !=null ">
+   AND project_id=#{project_id}
+  </if>
+  AND author_date IS NOT NULL
+  ORDER BY author_date DESC LIMIT 1
+ </select>
+
+ <select id="getFirstChangeForProject" resultType="com.softwaretrajectory.persistence.Change"
+  parameterType="Integer">
+  SELECT * FROM `change`
+  WHERE project_id=#{value}
+  ORDER BY author_date LIMIT 1
+ </select>
+
+ <select id="getLastChangeForProject" resultType="com.softwaretrajectory.persistence.Change"
+  parameterType="Integer">
+  SELECT * FROM `change`
+  WHERE project_id=#{value}
+  ORDER BY author_date DESC LIMIT 1
+ </select>
+
+ <select id="countChangesForUser" parameterType="HashMap" resultType="Integer">
+  SELECT count(distinct(id)) FROM `change`
+  WHERE author_id=#{author_id}
+  <if test="project_id !=null ">
+   AND project_id=#{project_id}
+  </if>
+ </select>
+
+ <select id="getChangesForAuthor" parameterType="HashMap" resultType="com.softwaretrajectory.persistence.Change">
+  SELECT * FROM `change`
+  WHERE author_id=#{author_id} and
+  author_date between
+  #{start,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  AND
+  #{end,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  order by
+  author_date;
+ </select>
+
+ <select id="getChangesForProject" parameterType="Integer" resultType="com.softwaretrajectory.persistence.Change">
+  SELECT * FROM
+  `change`
+  WHERE project_id=#{value}
+ </select>
+
+ <select id="getAllFalseChangesForProject" parameterType="Integer" resultType="Integer">
+  select
+  distinct(ch.id) from `change` ch
+  join change_target ct
+  on
+  ct.change_id=ch.id
+  where
+  project_id=#{value}
+  and added=0 and edited=0
+  and deleted=0 and renamed=0
+  and
+  copied=0;
+ </select>
+
+ <select id="getAllNullChangesForProject" parameterType="Integer"
+  resultType="com.softwaretrajectory.persistence.Change">
+  select distinct(ch.id) from `change` ch
+  join change_target
+  ct on
+  ct.change_id=ch.id
+  where
+  project_id=#{value}
+  and (added=null or
+  edited=null
+  or deleted=null or
+  renamed=null or copied=null);
+ </select>
+
+ <update id="updateChange" parameterType="com.softwaretrajectory.persistence.Change">
+  UPDATE `change`
+  SET
+  added_files=#{added_files},
+  edited_files=#{edited_files},
+  removed_files=#{removed_files},
+  renamed_files=#{renamed_files},
+  copied_files=#{copied_files}, added_lines=#{added_lines},
+  edited_lines=#{edited_lines},
+  removed_lines=#{removed_lines}
+  WHERE
+  id=#{id}
+ </update>
+
+
+ <insert id="saveChange" parameterType="com.softwaretrajectory.persistence.Change"
+  useGeneratedKeys="true" keyProperty="id">
+  INSERT INTO `change`
+  (project_id,
+  commit_hash,
+  tree_hash,`utc_time`,
+  author_id, author_date,
+  committer_id,
+  committer_date, subject,
+  added_files,
+  edited_files,
+  removed_files,
+  renamed_files, copied_files, added_lines, edited_lines, removed_lines)
+  VALUES
+  (#{project_id},
+  #{commit_hash},
+  #{tree_hash},
+  #{utc_time,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=DATE,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler},
+  #{author_id},
+  #{author_date,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=DATE,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler},
+  #{committer_id},
+  #{committer_date,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=DATE,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler},
+  #{subject},
+  #{added_files}, #{edited_files},
+  #{removed_files},#{renamed_files},#{copied_files},
+  #{added_lines},
+  #{edited_lines},
+  #{removed_lines})
+ </insert>
+
+ <insert id="replaceChange" parameterType="com.softwaretrajectory.persistence.Change"
+  useGeneratedKeys="true" keyProperty="id">
+  REPLACE INTO `change`
+  (project_id,
+  commit_hash,
+  tree_hash,`utc_time`,
+  author_id, author_date,
+  committer_id,
+  committer_date, subject,
+  added_files,
+  edited_files,
+  removed_files,
+  renamed_files, copied_files, added_lines, edited_lines, removed_lines)
+  VALUES
+  (#{project_id},
+  #{commit_hash},
+  #{tree_hash},
+  #{utc_time,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler},
+  #{author_id},
+  #{author_date,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler},
+  #{committer_id},
+  #{committer_date,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler},
+  #{subject},
+  #{added_files}, #{edited_files},
+  #{removed_files},#{renamed_files},#{copied_files},
+  #{added_lines},
+  #{edited_lines},
+  #{removed_lines})
+ </insert>
+
+ <select id="getPeopleSummaryForTime" parameterType="Map" resultType="Map">
+  SELECT
+  date_format(c.author_date, '%Y-%m-%d') as day,
+  count(distinct(c.id)) as commits,
+  sum(c.added_files)
+  as added_files,
+  sum(c.edited_files) as edited_files,
+  sum(c.removed_files) as removed_files,
+  sum(c.renamed_files) as renamed_files,
+  sum(c.copied_files) as copied_files,
+  sum(c.added_lines) as
+  added_lines,
+  sum(c.edited_lines) as edited_lines,
+  sum(c.removed_lines) as removed_lines
+  FROM `change`
+  c
+  WHERE c.author_id=#{author_id}
+  AND c.project_id=#{project_id}
+  AND c.author_date
+  BETWEEN #{start,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  AND #{end,
+  javaType=org.joda.time.LocalDateTime,
+  jdbcType=TIMESTAMP,
+  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  AND
+  date_format(c.author_date,'%H') BETWEEN #{start_hour} and #{end_hour}
+  GROUP BY
+  date_format(c.author_date, '%Y%m%d');
+ </select>
+
+ <select id="getDailyGrid" parameterType="Map" resultType="Map">
+ SELECT date_format(c.author_date, '%H') hour, 
+  count(distinct(c.id)) changes, 
+  sum(c.`added_files`) added_files,
+  sum(c.`edited_files`) edited_files,
+  sum(c.`removed_files`) removed_files,
+  sum(c.`renamed_files`) renamed_files,
+  sum(c.`copied_files`) copied_files,
+  sum(c.`added_lines`) added_lines,
+  sum(c.`edited_lines`) edited_lines,
+  sum(c.`removed_lines`) removed_lines,
+  sum(c.`edited_files`) edited_files
+ FROM `change` c 
+  WHERE c.author_id=#{author_id}
+  AND c.project_id=#{project_id}
+  AND c.author_date
+  BETWEEN #{start,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  AND #{end,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  GROUP by date_format(c.author_date,"%H");
+ </select>
+
+ <select id="getWeeklyGrid" parameterType="Map" resultType="Map">
+ SELECT DAYOFWEEK(c.author_date)-1 dow, 
+  count(distinct(c.id)) changes, 
+  sum(c.`added_files`) added_files,
+  sum(c.`edited_files`) edited_files,
+  sum(c.`removed_files`) removed_files,
+  sum(c.`renamed_files`) renamed_files,
+  sum(c.`copied_files`) copied_files,
+  sum(c.`added_lines`) added_lines,
+  sum(c.`edited_lines`) edited_lines,
+  sum(c.`removed_lines`) removed_lines,
+  sum(c.`edited_files`) edited_files
+ FROM `change` c 
+  WHERE c.author_id=#{author_id}
+  AND c.project_id=#{project_id}
+  AND c.author_date
+  BETWEEN #{start,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  AND #{end,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  GROUP by DAYOFWEEK(c.author_date);
+ </select>
+ 
+ <select id="getSumOfField" parameterType="Map" resultType="Map">
+ SELECT sum(c.${field}) `value`,  DATE_FORMAT(c.author_date, "%Y-%m-%d") `date` 
+ from `change` c where c.`author_date` 
+ BETWEEN #{start,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  AND #{end,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  group by `date` order by `date`
+ </select>
+
+</mapper>
