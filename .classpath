@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/gitective/gitective-core-0.9.10-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/mybatis/mybatis-3.2.7.jar"/>
 	<classpathentry kind="lib" path="lib/mysql/mysql-connector-java-5.1.21-bin.jar"/>
+	<classpathentry kind="lib" path="lib/jgit/org.eclipse.jgit-3.5.0.201409260305-r.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
