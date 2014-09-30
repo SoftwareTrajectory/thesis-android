@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import org.joda.time.DateTime;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import edu.hawaii.jmotif.sax.alphabet.NormalAlphabet;
+import edu.hawaii.jmotif.text.TextUtils;
 import edu.hawaii.jmotif.text.WordBag;
 import edu.hawaii.jmotif.timeseries.TSException;
 import edu.hawaii.jmotif.timeseries.TSUtils;
@@ -43,6 +45,8 @@ public class WeightVectorsMaker {
     HashMap<Integer, HashMap<String, HashMap<String, int[]>>> dataPreRelease = loadBehaviorData(PRE_DATA_FNAME);
     HashMap<Integer, HashMap<String, HashMap<String, int[]>>> dataPostRelease = loadBehaviorData(POST_DATA_FNAME);
 
+    ArrayList<WordBag> bags = new ArrayList<WordBag>();
+
     for (int rId : RELEASES_OF_INTEREST) {
 
       ReleaseRecord rr = releases.get(rId);
@@ -56,6 +60,7 @@ public class WeightVectorsMaker {
         wb.addWord(word);
       }
       consoleLogger.info("    wordbag: " + wb.toString().replace("\n", ", "));
+      bags.add(wb);
 
       HashMap<String, int[]> postArrays = dataPostRelease.get(rr.getId()).get("post");
       consoleLogger.info("  post-release arrays: " + postArrays.size());
@@ -65,8 +70,12 @@ public class WeightVectorsMaker {
         wb2.addWord(word);
       }
       consoleLogger.info("    wordbag: " + wb.toString().replace("\n", ", "));
-
+      bags.add(wb2);
     }
+
+    HashMap<String, HashMap<String, Double>> tfidf = TextUtils.computeTFIDF(bags);
+
+    System.out.println(TextUtils.tfidfToTable(tfidf));
 
   }
 
