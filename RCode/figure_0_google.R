@@ -12,21 +12,27 @@ con <- dbConnect(MySQL(), user="omap", password="omap", dbname="OMAP", host="loc
 #daily
 res_d <- dbGetQuery(con, 
     paste("select DATE_FORMAT(c.author_date, \"%Y-%m-%d\") a_date, sum(c.added_lines) lines_added from OMAP.change c ",
-          "where c.project_id=1 and DATE_FORMAT(c.author_date, \"%Y-%m-%d\")>\"2004-01-01\" ",
+          "join OMAP.change_people cp on c.author_id=cp.id where cp.email like \"%google.com\" and ", 
+          "c.project_id=1 and DATE_FORMAT(c.author_date, \"%Y-%m-%d\")>\"2004-01-01\" ",
           "group by YEAR(a_date),MONTH(a_date),DAY(a_date) ",
           "order by a_date;",sep=""))
 #weekly
 res_w <- dbGetQuery(con, 
           paste("select DATE_FORMAT(c.author_date, \"%Y-%m-%d\") a_date, sum(c.added_lines) lines_added from OMAP.change c ",
-          "where c.project_id=1 and DATE_FORMAT(c.author_date, \"%Y-%m-%d\")>\"2004-01-01\" ",
+          "join OMAP.change_people cp on c.author_id=cp.id where cp.email like \"%google.com\" and ",                 
+          "c.project_id=1 and DATE_FORMAT(c.author_date, \"%Y-%m-%d\")>\"2004-01-01\" ",
           "group by YEAR(a_date),MONTH(a_date),WEEK(a_date) ",
           "order by a_date;",sep=""))
 # monthly
 res_m <- dbGetQuery(con, 
           paste("select DATE_FORMAT(c.author_date, \"%Y-%m-%d\") a_date, sum(c.added_lines) lines_added from OMAP.change c ",
-          "where c.project_id=1 and DATE_FORMAT(c.author_date, \"%Y-%m-%d\")>\"2004-01-01\" ",
+          "join OMAP.change_people cp on c.author_id=cp.id where cp.email like \"%google.com\" and ",                 
+          "c.project_id=1 and DATE_FORMAT(c.author_date, \"%Y-%m-%d\")>\"2004-01-01\" ",
           "group by YEAR(a_date),MONTH(a_date) ",
           "order by a_date;",sep=""))
+write.table(res_d, file="daily-google.csv",col.names=T)
+write.table(res_w, file="weekly-google.csv",col.names=T)
+write.table(res_m, file="monthly-google.csv",col.names=T)
 res_d$a_date=as.POSIXct(res_d$a_date)
 res_w$a_date=as.POSIXct(res_w$a_date)
 res_m$a_date=as.POSIXct(res_m$a_date)
