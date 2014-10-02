@@ -2,19 +2,19 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.softwaretrajectory.persistence">
+<mapper namespace="edu.hawaii.senin.trajectory.android.persistence">
 
- <select id="getAndroidProjectByName" resultType="com.softwaretrajectory.persistence.ChangeProject"
+ <select id="getAndroidProjectByName" resultType="edu.hawaii.senin.trajectory.android.persistence.ChangeProject"
   parameterType="String">
   SELECT * FROM android.change_project WHERE name = #{name}
  </select>
 
- <select id="getAndroidUserForId" resultType="com.softwaretrajectory.persistence.ChangePeople"
+ <select id="getAndroidUserForId" resultType="edu.hawaii.senin.trajectory.android.persistence.ChangePeople"
   parameterType="String">
   SELECT * FROM android.change_people WHERE id = #{value}
  </select>
 
- <select id="getAndroidAuthorsForInterval" resultType="com.softwaretrajectory.persistence.ChangePeople"
+ <select id="getAndroidAuthorsForInterval" resultType="edu.hawaii.senin.trajectory.android.persistence.ChangePeople"
   parameterType="HashMap">
   SELECT cp.* FROM android.change_people cp where cp.id IN
   (select distinct(c.author_id) from
@@ -24,19 +24,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   #{start,
   javaType=org.joda.time.LocalDateTime,
   jdbcType=TIMESTAMP,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeTimestampTypeHandler}
   AND
   #{end,
   javaType=org.joda.time.LocalDateTime,
   jdbcType=TIMESTAMP,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeTimestampTypeHandler}
   )
   <if test="email_mask !=null ">
    AND cp.email LIKE "${email_mask}"
   </if>
  </select>
 
- <select id="getTopAndroidAuthorsForInterval" resultType="com.softwaretrajectory.persistence.ChangePeople"
+ <select id="getTopAndroidAuthorsForInterval" resultType="edu.hawaii.senin.trajectory.android.persistence.ChangePeople"
   parameterType="HashMap">
   select * from (select cp.*, count(distinct(DATE_FORMAT(c.author_date, '%Y%m%d')))
   cnt from
@@ -49,12 +49,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   #{start,
   javaType=org.joda.time.LocalDateTime,
   jdbcType=TIMESTAMP,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeTimestampTypeHandler}
   AND
   #{end,
   javaType=org.joda.time.LocalDateTime,
   jdbcType=TIMESTAMP,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
+  typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeTimestampTypeHandler}
   group by
   c.author_id order by cnt desc) tmp where tmp.cnt>=#{cutoff}
  </select>
@@ -70,11 +70,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   BETWEEN #{start,
   javaType=org.joda.time.LocalDateTime,
   jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
   AND #{end,
   javaType=org.joda.time.LocalDateTime,
   jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
   AND
   DATE_FORMAT(c.author_date, "%H") between 0 AND 24
   <if test="email_mask !=null ">
@@ -97,11 +97,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   BETWEEN #{start,
   javaType=org.joda.time.LocalDateTime,
   jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
   AND #{end,
   javaType=org.joda.time.LocalDateTime,
   jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
+  typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
   AND
   DATE_FORMAT(c.author_date, "%H") between 0 AND 24
   and NOT(upper(c.subject) LIKE "%MERGE%")

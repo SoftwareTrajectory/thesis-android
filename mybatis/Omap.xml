@@ -2,80 +2,80 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.softwaretrajectory.persistence">
+<mapper namespace="edu.hawaii.senin.trajectory.android.persistence">
 
- <select id="getAndroidProjectByName" resultType="com.softwaretrajectory.persistence.ChangeProject"
-  parameterType="String">
-  SELECT * FROM OMAP.change_project WHERE name = #{name}
- </select>
+  <select id="getAndroidProjectByName" resultType="edu.hawaii.senin.trajectory.android.persistence.ChangeProject"
+    parameterType="String">
+    SELECT * FROM OMAP.change_project WHERE name = #{name}
+  </select>
 
- <select id="getAndroidAuthorsForInterval" resultType="com.softwaretrajectory.persistence.ChangePeople"
-  parameterType="HashMap">
-  SELECT cp.* FROM OMAP.change_people cp where cp.id IN
-  (select distinct(c.author_id) from
-  OMAP.change c where
-  c.project_id=project_id
-  and c.author_date BETWEEN
-  #{start,
-  javaType=org.joda.time.LocalDateTime,
-  jdbcType=TIMESTAMP,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
-  AND
-  #{end,
-  javaType=org.joda.time.LocalDateTime,
-  jdbcType=TIMESTAMP,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler}
-  )
-  <if test="email_mask !=null ">
-   AND cp.email LIKE "${email_mask}"
-  </if>
+  <select id="getAndroidAuthorsForInterval" resultType="edu.hawaii.senin.trajectory.android.persistence.ChangePeople"
+    parameterType="HashMap">
+    SELECT cp.* FROM OMAP.change_people cp where cp.id IN
+    (select distinct(c.author_id) from
+    OMAP.change c where
+    c.project_id=project_id
+    and c.author_date BETWEEN
+    #{start,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=TIMESTAMP,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeTimestampTypeHandler}
+    AND
+    #{end,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=TIMESTAMP,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeTimestampTypeHandler}
+    )
+    <if test="email_mask !=null ">
+      AND cp.email LIKE "${email_mask}"
+    </if>
 
- </select>
+  </select>
 
- <select id="getSumOfAndroidField" parameterType="Map" resultType="Map">
-  SELECT sum(c.${field}) `value`,
-  DATE_FORMAT(c.author_date, "%Y-%m-%d") `date`
-  from
-  OMAP.change c join OMAP.change_people cp
-  on cp.id=c.author_id
-  where c.`author_date`
-  BETWEEN #{start,
-  javaType=org.joda.time.LocalDateTime,
-  jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
-  AND #{end,
-  javaType=org.joda.time.LocalDateTime,
-  jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
-  AND
-  DATE_FORMAT(c.author_date, "%H") between 0 AND 9
-  <if test="email_mask !=null ">
-   AND cp.email LIKE "${email_mask}"
-  </if>
-  group by `date` order
-  by `date`
- </select>
+  <select id="getSumOfAndroidField" parameterType="Map" resultType="Map">
+    SELECT sum(c.${field}) `value`,
+    DATE_FORMAT(c.author_date, "%Y-%m-%d") `date`
+    from
+    OMAP.change c join OMAP.change_people cp
+    on cp.id=c.author_id
+    where c.`author_date`
+    BETWEEN #{start,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
+    AND #{end,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
+    AND
+    DATE_FORMAT(c.author_date, "%H") between 0 AND 9
+    <if test="email_mask !=null ">
+      AND cp.email LIKE "${email_mask}"
+    </if>
+    group by `date` order
+    by `date`
+  </select>
 
 
- <select id="getSumOfAndroidFieldForAuthor" parameterType="Map" resultType="Map">
-  SELECT
-  sum(c.${field}) `value`,
-  DATE_FORMAT(c.author_date, "%Y-%m-%d") `date`
-  from
-  OMAP.change c
-  where c.author_id=#{author_id}
-  AND c.`author_date`
-  BETWEEN #{start,
-  javaType=org.joda.time.LocalDateTime,
-  jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
-  AND #{end,
-  javaType=org.joda.time.LocalDateTime,
-  jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
-  and DATE_FORMAT(c.author_date, "%H") between 0 AND 12
-  group by `date` order
-  by `date`
- </select>
+  <select id="getSumOfAndroidFieldForAuthor" parameterType="Map" resultType="Map">
+    SELECT
+    sum(c.${field}) `value`,
+    DATE_FORMAT(c.author_date, "%Y-%m-%d") `date`
+    from
+    OMAP.change c
+    where c.author_id=#{author_id}
+    AND c.`author_date`
+    BETWEEN #{start,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
+    AND #{end,
+    javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
+    and DATE_FORMAT(c.author_date, "%H") between 0 AND 12
+    group by `date` order
+    by `date`
+  </select>
 
 </mapper>

@@ -25,7 +25,8 @@ public class ReleaseFactory {
 
     releases = new HashMap<Integer, ReleaseRecord>();
     try {
-      BufferedReader bw = new BufferedReader(new FileReader(new File("data/android_releases.csv")));
+      BufferedReader bw = new BufferedReader(new FileReader(new File(
+          "data/android_releases_major.csv")));
       String str = null;
       int counter = 1;
       while (null != (str = bw.readLine()) && str.replaceAll("\\s+", "").length() > 0) {

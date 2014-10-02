@@ -37,9 +37,6 @@ public class OMAPDB {
   private static final String STACK_DB_CONFIGNAME = "mybatis-omap.xml";
   private static final String STACK_DB_ENVIRONMENT = "production_pooled";
 
-  /** Logger variable. */
-  private Logger log;
-
   /** Test database SQL factory. */
   private SqlSessionFactory sessionFactory;
 
@@ -82,7 +79,7 @@ public class OMAPDB {
     this.dbConfigFileName = STACK_DB_CONFIGNAME;
     this.dbEnvironmentKey = STACK_DB_ENVIRONMENT;
 
-    this.log.info("Getting connected to the database, myBATIS config: " + dbConfigFileName
+    consoleLogger.info("Getting connected to the database, myBATIS config: " + dbConfigFileName
         + ", environment key: " + dbEnvironmentKey);
 
     // do check for the file existence
@@ -100,7 +97,7 @@ public class OMAPDB {
 
     this.session = this.sessionFactory.openSession(ExecutorType.REUSE);
 
-    this.log.info("Connected to database.");
+    consoleLogger.info("Connected to database.");
 
   }
 

@@ -2,70 +2,70 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.softwaretrajectory.persistence">
+<mapper namespace="edu.hawaii.senin.trajectory.android.persistence">
 
- <select id="getFrequencies" parameterType="Map" resultType="Map">
-  SELECT s.${target_metrics} word,
-  count(s.${target_metrics}) frequency FROM `sax_series` s
-  WHERE params=#{params} AND tag=#{tag}
-  <if test="project_id !=null ">
-   AND project_id=#{project_id}
-  </if>
-  <if test="author_id !=null ">
-   AND author_id=#{author_id}
-  </if>
-  AND s.`day` BETWEEN 
-  #{start, javaType=org.joda.time.LocalDateTime,
-  jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
-  AND #{end, javaType=org.joda.time.LocalDateTime,
-  jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler}
-  group by
-  s.${target_metrics};
- </select>
+  <select id="getFrequencies" parameterType="Map" resultType="Map">
+    SELECT s.${target_metrics} word,
+    count(s.${target_metrics}) frequency FROM `sax_series` s
+    WHERE params=#{params} AND tag=#{tag}
+    <if test="project_id !=null ">
+      AND project_id=#{project_id}
+    </if>
+    <if test="author_id !=null ">
+      AND author_id=#{author_id}
+    </if>
+    AND s.`day` BETWEEN
+    #{start, javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
+    AND #{end, javaType=org.joda.time.LocalDateTime,
+    jdbcType=DATE,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler}
+    group by
+    s.${target_metrics};
+  </select>
 
- <select id="selectSSEntry" parameterType="com.softwaretrajectory.persistence.SaxSeries"
-  resultType="com.softwaretrajectory.persistence.SaxSeries">
-  SELECT * FROM `sax_series`
-  WHERE `day`=#{day,
-  javaType=org.joda.time.LocalDate,
-  jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateDateTypeHandler}
-  AND
-  dtag=#{dtag} AND type=#{type} AND
-  params=#{params}
-  AND author_id=#{author_id} AND
-  project_id=#{project_id}
- </select>
+  <select id="selectSSEntry" parameterType="edu.hawaii.senin.trajectory.android.persistence.SaxSeries"
+    resultType="edu.hawaii.senin.trajectory.android.persistence.SaxSeries">
+    SELECT * FROM `sax_series`
+    WHERE `day`=#{day,
+    javaType=org.joda.time.LocalDate,
+    jdbcType=DATE,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateDateTypeHandler}
+    AND
+    dtag=#{dtag} AND type=#{type} AND
+    params=#{params}
+    AND author_id=#{author_id} AND
+    project_id=#{project_id}
+  </select>
 
 
 
- <insert id="saveSSEntry" parameterType="com.softwaretrajectory.persistence.SaxSeries">
-  INSERT INTO sax_series
-  (`day`, tag, params,
-  author_id,
-  project_id,
-  commits, targets, `lines`,
-  targets_added, targets_edited, targets_deleted,
-  targets_renamed, targets_copied,
-  lines_added, lines_edited, lines_deleted)
-  VALUES
-  (#{day,
-  javaType=org.joda.time.LocalDate,
-  jdbcType=DATE,
-  typeHandler=com.softwaretrajectory.persistence.LocalDateDateTypeHandler},
-  #{tag},
-  #{params},
-  #{author_id}, #{project_id},
-  #{commits}, #{targets}, #{lines},
-  #{targets_added},
-  #{targets_edited},
-  #{targets_deleted}, #{targets_renamed}, #{targets_copied},
-  #{lines_added},
-  #{lines_edited},
-  #{lines_deleted})
- </insert>
+  <insert id="saveSSEntry" parameterType="edu.hawaii.senin.trajectory.android.persistence.SaxSeries">
+    INSERT INTO sax_series
+    (`day`, tag, params,
+    author_id,
+    project_id,
+    commits, targets, `lines`,
+    targets_added, targets_edited, targets_deleted,
+    targets_renamed, targets_copied,
+    lines_added, lines_edited, lines_deleted)
+    VALUES
+    (#{day,
+    javaType=org.joda.time.LocalDate,
+    jdbcType=DATE,
+    typeHandler=edu.hawaii.senin.trajectory.android.persistence.LocalDateDateTypeHandler},
+    #{tag},
+    #{params},
+    #{author_id}, #{project_id},
+    #{commits}, #{targets}, #{lines},
+    #{targets_added},
+    #{targets_edited},
+    #{targets_deleted}, #{targets_renamed}, #{targets_copied},
+    #{lines_added},
+    #{lines_edited},
+    #{lines_deleted})
+  </insert>
 
 </mapper>
 

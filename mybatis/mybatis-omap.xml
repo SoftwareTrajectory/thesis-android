@@ -5,45 +5,46 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 <configuration>
 
 
- <typeHandlers>
+  <typeHandlers>
 
-  <typeHandler javaType="org.joda.time.LocalDateTime" jdbcType="DATE"
-   handler="com.softwaretrajectory.persistence.LocalDateTimeDateTypeHandler" />
+    <typeHandler javaType="org.joda.time.LocalDateTime" jdbcType="DATE"
+      handler="edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeDateTypeHandler" />
 
-  <typeHandler javaType="org.joda.time.LocalDateTime" jdbcType="TIMESTAMP"
-   handler="com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler" />
+    <typeHandler javaType="org.joda.time.LocalDateTime" jdbcType="TIMESTAMP"
+      handler="edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeTimestampTypeHandler" />
 
-  <typeHandler javaType="org.joda.time.LocalDateTime"
-   handler="com.softwaretrajectory.persistence.LocalDateTimeTimestampTypeHandler" />
+    <typeHandler javaType="org.joda.time.LocalDateTime"
+      handler="edu.hawaii.senin.trajectory.android.persistence.LocalDateTimeTimestampTypeHandler" />
 
-  <typeHandler javaType="org.joda.time.LocalDate" jdbcType="DATE"
-   handler="com.softwaretrajectory.persistence.LocalDateDateTypeHandler" />
+    <typeHandler javaType="org.joda.time.LocalDate" jdbcType="DATE"
+      handler="edu.hawaii.senin.trajectory.android.persistence.LocalDateDateTypeHandler" />
 
-  <typeHandler javaType="org.joda.time.LocalDate" handler="com.softwaretrajectory.persistence.LocalDateDateTypeHandler" />
+    <typeHandler javaType="org.joda.time.LocalDate"
+      handler="edu.hawaii.senin.trajectory.android.persistence.LocalDateDateTypeHandler" />
 
- </typeHandlers>
+  </typeHandlers>
 
- <environments default="production_pooled">
+  <environments default="production_pooled">
 
-  <environment id="production_pooled">
-   <transactionManager type="JDBC" />
-   <dataSource type="POOLED">
-    <property name="driver" value="com.mysql.jdbc.Driver" />
-    <property name="url" value="jdbc:mysql://localhost:3306/OMAP" />
-    <property name="username" value="omap" />
-    <property name="password" value="omap" />
-   </dataSource>
-  </environment>
+    <environment id="production_pooled">
+      <transactionManager type="JDBC" />
+      <dataSource type="POOLED">
+        <property name="driver" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/OMAP" />
+        <property name="username" value="omap" />
+        <property name="password" value="omap" />
+      </dataSource>
+    </environment>
 
- </environments>
+  </environments>
 
- <mappers>
-  <mapper resource="ChangePeople.xml" />
-  <mapper resource="Change.xml" />
-  <mapper resource="ChangeProject.xml" />
-  <mapper resource="ChangeTarget.xml" />
-  <mapper resource="Sax.xml" />
-  <mapper resource="Android.xml" />
- </mappers>
+  <mappers>
+    <mapper resource="ChangePeople.xml" />
+    <mapper resource="Change.xml" />
+    <mapper resource="ChangeProject.xml" />
+    <mapper resource="ChangeTarget.xml" />
+    <mapper resource="Sax.xml" />
+    <mapper resource="Android.xml" />
+  </mappers>
 
 </configuration>

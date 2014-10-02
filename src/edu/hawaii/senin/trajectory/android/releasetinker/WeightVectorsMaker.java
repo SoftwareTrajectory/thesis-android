@@ -21,12 +21,12 @@ import edu.hawaii.jmotif.timeseries.TSUtils;
 
 public class WeightVectorsMaker {
 
-  private static final String PRE_DATA_FNAME = "results/pre_portraits.txt";
-  private static final String POST_DATA_FNAME = "results/post_portraits.txt";
+  private static final String PRE_DATA_FNAME = "RCode/pre_portraits_weekly_google.txt";
+  private static final String POST_DATA_FNAME = "RCode/post_portraits_weekly_google.txt";
 
   private static HashMap<Integer, ReleaseRecord> releases;
 
-  private static final int[] RELEASES_OF_INTEREST = { 38, 36, 34 };
+  private static final int[] RELEASES_OF_INTEREST = { 1, 3, 5 };
 
   private static Logger consoleLogger;
   private static Level LOGGING_LEVEL = Level.INFO;

@@ -2,20 +2,20 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.softwaretrajectory.persistence">
+<mapper namespace="edu.hawaii.senin.trajectory.android.persistence">
 
- <select id="getTargets" resultType="com.softwaretrajectory.persistence.ChangeTarget">
+ <select id="getTargets" resultType="edu.hawaii.senin.trajectory.android.persistence.ChangeTarget">
   SELECT * FROM change_target
   WHERE change_id=#{value}
  </select>
 
- <select id="getChangeTarget" resultType="com.softwaretrajectory.persistence.ChangeTarget"
-  parameterType="com.softwaretrajectory.persistence.ChangeTarget">
+ <select id="getChangeTarget" resultType="edu.hawaii.senin.trajectory.android.persistence.ChangeTarget"
+  parameterType="edu.hawaii.senin.trajectory.android.persistence.ChangeTarget">
   SELECT * FROM change_target
   WHERE change_id=#{change_id} AND target=#{target}
  </select>
 
- <update id="updateTarget" parameterType="com.softwaretrajectory.persistence.ChangeTarget">
+ <update id="updateTarget" parameterType="edu.hawaii.senin.trajectory.android.persistence.ChangeTarget">
   UPDATE change_target SET
   added=#{added},
   edited=#{edited}, deleted=#{deleted},
@@ -28,7 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  </update>
 
 
- <insert id="saveTarget" parameterType="com.softwaretrajectory.persistence.ChangeTarget">
+ <insert id="saveTarget" parameterType="edu.hawaii.senin.trajectory.android.persistence.ChangeTarget">
   REPLACE INTO
   change_target (change_id,
   target,
