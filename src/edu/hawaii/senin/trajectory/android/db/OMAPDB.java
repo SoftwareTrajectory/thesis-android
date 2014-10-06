@@ -3,6 +3,7 @@ package edu.hawaii.senin.trajectory.android.db;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.ibatis.session.ExecutorType;
@@ -29,9 +30,6 @@ public class OMAPDB {
 
   /** The mapper instance key. */
   public static final String PRODUCTION_INSTANCE = "production";
-
-  /** The logger we will use. */
-  private static final String DB_LOGGER_NAME = "postgre.db";
 
   /** The db configuration constants. */
   private static final String STACK_DB_CONFIGNAME = "mybatis-omap.xml";
@@ -135,132 +133,31 @@ public class OMAPDB {
   }
 
   public synchronized ChangeProject getProject(String projectName) {
-    return this.session.selectOne("getProjectByName", projectName);
-  }
-
-  public synchronized List<ChangePeople> getAllProjectUsers() {
-    return this.session.selectList("getPeople");
-  }
-
-  public List<ChangePeople> getAuthorsForInterval(Integer projectId, LocalDateTime start,
-      LocalDateTime end) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("start", start);
-    params.put("end", end);
-    return session.selectList("getAuthorsForInterval", params);
-  }
-
-  public synchronized Change getFirstChangeForUser(Integer projectId, Integer userId) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("author_id", userId);
-    return session.selectOne("getFirstChangeForAuthor", params);
-  }
-
-  public synchronized Change getLastChangeForUser(Integer projectId, Integer userId) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("author_id", userId);
-    return session.selectOne("getLastChangeForAuthor", params);
-  }
-
-  public synchronized Integer countChangesForUser(Integer projectId, Integer userId) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("author_id", userId);
-    return this.session.selectOne("countChangesForUser", params);
-  }
-
-  public List<HashMap<String, Object>> getFrequencies(Integer projectId, Integer authorId,
-      String tagStr, String paramStr, LocalDateTime start, LocalDateTime end, String target_metrics) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("author_id", authorId);
-    params.put("params", paramStr);
-    params.put("tag", tagStr);
-    params.put("start", start);
-    params.put("end", end);
-    params.put("target_metrics", target_metrics);
-    return this.session.selectList("getFrequencies", params);
-  }
-
-  public SingleDayRecord getASingleDayRecord(Integer projectId, Integer authorId, LocalDateTime date) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("author_id", authorId);
-    params.put("start", date);
-    params.put("end", date.plusDays(1));
-    SingleDayRecord dp = new SingleDayRecord();
-    List<HashMap<String, Object>> res = this.session.selectList("getDailyGrid", params);
-    for (HashMap<String, Object> recSet : res) {
-      dp.put(recSet);
-    }
-    return dp;
-  }
-
-  public double[] get(Integer projectId, String field, LocalDateTime start, LocalDateTime end) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("field", field);
-    params.put("start", start);
-    params.put("end", end.plusDays(1));
-    List<HashMap<String, Object>> res = this.session.selectList("getSumOfField", params);
-    double[] resSeries = new double[Days.daysBetween(start, end).getDays() + 1];
-    for (int i = 0; i < res.size(); i++) {
-      resSeries[Days.daysBetween(start, LocalDateTime.parse((String) res.get(i).get("date")))
-          .getDays()] = ((BigDecimal) res.get(i).get("value")).doubleValue();
-    }
-    return resSeries;
-  }
-
-  public ChangeProject getAndroidProject(String projectName) {
     return this.session.selectOne("getAndroidProjectByName", projectName);
   }
 
-  public double[] getAndroidMetricAsSeries(Integer projectId, String field, String emailMask,
-      LocalDateTime start, LocalDateTime end) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("field", field);
-    params.put("email_mask", emailMask);
-    params.put("start", start);
-    params.put("end", end.plusDays(1));
-    List<HashMap<String, Object>> res = this.session.selectList("getSumOfAndroidField", params);
-    double[] resSeries = new double[Days.daysBetween(start, end).getDays() + 1];
-    for (int i = 0; i < res.size(); i++) {
-      resSeries[Days.daysBetween(start, LocalDateTime.parse((String) res.get(i).get("date")))
-          .getDays()] = ((BigDecimal) res.get(i).get("value")).doubleValue();
-    }
-    return resSeries;
-  }
-
   public List<ChangePeople> getAndroidAuthorsForInterval(Integer projectId, String emailMask,
-      LocalDateTime start, LocalDateTime end) {
+      LocalDateTime start, LocalDateTime end, String metric) {
     HashMap<String, Object> params = new HashMap<String, Object>();
     params.put("project_id", projectId);
     params.put("email_mask", emailMask);
     params.put("start", start);
     params.put("end", end);
-    return session.selectList("getAndroidAuthorsForInterval", params);
+    params.put("metric", metric);
+    List<Long> ids = session.selectList("getAndroidAuthorsForInterval", params);
+    List<ChangePeople> res = new ArrayList<ChangePeople>();
+    for (Long id : ids) {
+      res.add((ChangePeople) session.selectOne("getAndroidUserForId", id));
+    }
+    return res;
   }
 
-  public List<ChangePeople> getTopAndroidAuthorsForInterval(Integer projectId, LocalDateTime start,
-      LocalDateTime end, int cutoff) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("project_id", projectId);
-    params.put("start", start);
-    params.put("end", end);
-    params.put("cutoff", cutoff);
-    return session.selectList("getTopAndroidAuthorsForInterval", params);
-  }
-
-  public double[] getAndroidAuthorMetricAsSeries(Integer projectId, String field, Integer authorId,
-      LocalDateTime start, LocalDateTime end) {
+  public double[] getAndroidAuthorMetricAsSeries(Integer projectId, Integer authorId,
+      String metric, LocalDateTime start, LocalDateTime end) {
     HashMap<String, Object> params = new HashMap<String, Object>();
     params.put("project_id", projectId);
     params.put("author_id", authorId);
-    params.put("field", field);
+    params.put("metric", metric);
     params.put("start", start);
     params.put("end", end);
     List<HashMap<String, Object>> res = this.session.selectList("getSumOfAndroidFieldForAuthor",
@@ -272,9 +169,4 @@ public class OMAPDB {
     }
     return resSeries;
   }
-
-  public ChangePeople getAndroidUserForId(Integer id) {
-    return this.session.selectOne("getAndroidUserForId", id);
-  }
-
 }
