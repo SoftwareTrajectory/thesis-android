@@ -39,12 +39,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
   </environments>
 
   <mappers>
-    <mapper resource="ChangePeople.xml" />
-    <mapper resource="Change.xml" />
-    <mapper resource="ChangeProject.xml" />
-    <mapper resource="ChangeTarget.xml" />
-    <mapper resource="Sax.xml" />
-    <mapper resource="Android.xml" />
+    <mapper resource="OMAP.xml" />
   </mappers>
 
 </configuration>
