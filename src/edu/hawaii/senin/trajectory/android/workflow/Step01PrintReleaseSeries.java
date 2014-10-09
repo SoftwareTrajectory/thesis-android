@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TimeZone;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -48,8 +47,9 @@ public class Step01PrintReleaseSeries {
 
   // this is the set of metrics we'll be retrieving data for
   //
-  private static final String[] METRICS_OF_INTEREST = { "added_files", "edited_files",
-      "removed_files", "added_lines", "edited_lines", "removed_lines" };
+  private static final String[] METRICS_OF_INTEREST = { "added_files" };
+  // , "edited_files",
+  // "removed_files", "added_lines", "edited_lines", "removed_lines" };
 
   // this is the output prefix
   //

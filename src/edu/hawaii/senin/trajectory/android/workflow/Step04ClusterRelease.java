@@ -8,9 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -26,21 +23,21 @@ import edu.hawaii.jmotif.text.cluster.RandomStartStrategy;
 import edu.hawaii.jmotif.text.cluster.TextKMeans;
 import edu.hawaii.jmotif.timeseries.TSException;
 
-public class ClusterWebRelease {
+public class Step04ClusterRelease {
 
   // data
   //
-  private static final String TRAINING_DATA = "results/omap_monthly_classes_added_lines.csv";
+  private static final String TRAINING_DATA = "results/test.csv";
 
   // prefix for all of the output
   private static final String PREFIX = "/home/psenin/dendroscope/";
 
   // SAX parameters to use
   //
-  private static final int WINDOW_SIZE = 13;
-  private static final int PAA_SIZE = 5;
+  private static final int WINDOW_SIZE = 21;
+  private static final int PAA_SIZE = 10;
   private static final int ALPHABET_SIZE = 12;
-  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.CLASSIC;
+  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.EXACT;
 
   // logger business
   private static Logger consoleLogger;

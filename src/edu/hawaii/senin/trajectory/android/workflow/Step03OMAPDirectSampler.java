@@ -28,7 +28,7 @@ import edu.hawaii.jmotif.util.StackTrace;
  * @author psenin
  * 
  */
-public class OMAPDirectSampler extends UCRGenericClassifier {
+public class Step03OMAPDirectSampler extends UCRGenericClassifier {
 
   // num of threads to use
   //
@@ -36,7 +36,7 @@ public class OMAPDirectSampler extends UCRGenericClassifier {
 
   // data
   //
-  private static final String TRAINING_DATA = "results/omap_monthly_classes_added_lines.csv";
+  private static final String TRAINING_DATA = "results/test.csv";
 
   // output prefix
   //
@@ -53,13 +53,13 @@ public class OMAPDirectSampler extends UCRGenericClassifier {
   private static final int ALPHABET_MIN = 3;
   private static final int ALPHABET_MAX = 16;
 
-  private static final int HOLD_OUT_NUM = 1;
+  private static final int HOLD_OUT_NUM = 100;
 
   private static final int MAX_ITERATIONS = 16;
 
   private static List<String> globalResults = new ArrayList<String>();
 
-  private OMAPDirectSampler() {
+  private Step03OMAPDirectSampler() {
     super();
   }
 
@@ -189,7 +189,6 @@ public class OMAPDirectSampler extends UCRGenericClassifier {
     }
 
     BufferedWriter bw = new BufferedWriter(new FileWriter(outputPrefix + ".csv"));
-
     for (String line : globalResults) {
       bw.write(line + CR);
     }
