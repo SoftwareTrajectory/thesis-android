@@ -5,35 +5,29 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import edu.hawaii.jmotif.sax.alphabet.NormalAlphabet;
-import edu.hawaii.jmotif.text.TextUtils;
 import edu.hawaii.jmotif.text.WordBag;
 import edu.hawaii.jmotif.timeseries.TSException;
 import edu.hawaii.jmotif.timeseries.TSUtils;
-import edu.hawaii.senin.trajectory.android.releasetinker.ReleaseFactory;
-import edu.hawaii.senin.trajectory.android.releasetinker.ReleaseRecord;
 
 public class WeightVectorsMaker {
 
-  private static final String PRE_DATA_FNAME = "RCode/pre_portraits_weekly_google.txt";
-  private static final String POST_DATA_FNAME = "RCode/post_portraits_weekly_google.txt";
-
-  private static HashMap<Integer, ReleaseRecord> releases;
+  private static final String PRE_DATA_FNAME = "results/release_28_added_lines.csv";
 
   private static final int[] RELEASES_OF_INTEREST = { 1, 3, 5 };
 
   private static Logger consoleLogger;
   private static Level LOGGING_LEVEL = Level.INFO;
 
-  private static final DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-DD");
+  private static final DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
 
   static {
     consoleLogger = (Logger) LoggerFactory.getLogger(WeightVectorsMaker.class);
@@ -42,43 +36,46 @@ public class WeightVectorsMaker {
 
   public static void main(String[] args) throws TSException {
 
-    releases = ReleaseFactory.getReleases();
-
-    HashMap<Integer, HashMap<String, HashMap<String, int[]>>> dataPreRelease = loadBehaviorData(PRE_DATA_FNAME);
-    HashMap<Integer, HashMap<String, HashMap<String, int[]>>> dataPostRelease = loadBehaviorData(POST_DATA_FNAME);
+    // "pre" or "post"
+    // "release numeric ID"
+    // "email, dates"
+    // metrics
+    HashMap<String, HashMap<Integer, HashMap<String, HashMap<String, double[]>>>> data = loadBehaviorData(PRE_DATA_FNAME);
 
     ArrayList<WordBag> bags = new ArrayList<WordBag>();
 
     for (int rId : RELEASES_OF_INTEREST) {
 
-      ReleaseRecord rr = releases.get(rId);
-      consoleLogger.info("Processing release #" + rr.getId() + ", " + rr.getName());
+      HashMap<String, HashMap<String, double[]>> pre = data.get("pre").get(rId);
+      WordBag wb = new WordBag("pre-" + rId);
 
-      HashMap<String, int[]> preArrays = dataPreRelease.get(rr.getId()).get("pre");
+      Collection<HashMap<String, double[]>> preArrays = pre.values();
+      for (HashMap<String, double[]> e : preArrays) {
+        for (double[] dd : e.values()) {
+          String word = toSAX(dd, 7, 4, 3);
+          wb.addWord(word);
+        }
+      }
       consoleLogger.info("  pre-release arrays: " + preArrays.size());
-      WordBag wb = new WordBag("pre-" + rr.getId());
-      for (Entry<String, int[]> e : preArrays.entrySet()) {
-        String word = toSAX(toDoubles(e.getValue()), 7, 4, 3);
-        wb.addWord(word);
-      }
-      consoleLogger.info("    wordbag: " + wb.toString().replace("\n", ", "));
+
       bags.add(wb);
+      //
+      // HashMap<String, int[]> postArrays = dataPostRelease.get(rr.getId()).get("post");
+      // consoleLogger.info("  post-release arrays: " + postArrays.size());
+      // WordBag wb2 = new WordBag("post-" + rr.getId());
+      // for (Entry<String, int[]> e : postArrays.entrySet()) {
+      // String word = toSAX(toDoubles(e.getValue()), 7, 4, 3);
+      // wb2.addWord(word);
+      // }
+      // consoleLogger.info("    wordbag: " + wb.toString().replace("\n", ", "));
+      // bags.add(wb2);
+      // }
+      //
+      // HashMap<String, HashMap<String, Double>> tfidf = TextUtils.computeTFIDF(bags);
+      //
+      // System.out.println(TextUtils.tfidfToTable(tfidf));DateTime
 
-      HashMap<String, int[]> postArrays = dataPostRelease.get(rr.getId()).get("post");
-      consoleLogger.info("  post-release arrays: " + postArrays.size());
-      WordBag wb2 = new WordBag("post-" + rr.getId());
-      for (Entry<String, int[]> e : postArrays.entrySet()) {
-        String word = toSAX(toDoubles(e.getValue()), 7, 4, 3);
-        wb2.addWord(word);
-      }
-      consoleLogger.info("    wordbag: " + wb.toString().replace("\n", ", "));
-      bags.add(wb2);
     }
-
-    HashMap<String, HashMap<String, Double>> tfidf = TextUtils.computeTFIDF(bags);
-
-    System.out.println(TextUtils.tfidfToTable(tfidf));
-
   }
 
   private static String toSAX(double[] ts, int slidingWindowSize, int paaSize, int alphabetSize)
@@ -95,50 +92,49 @@ public class WeightVectorsMaker {
     return String.valueOf(currentString);
   }
 
-  private static double[] toDoubles(int[] value) {
-    double[] res = new double[value.length];
-    for (int i = 0; i < value.length; i++) {
-      res[i] = (double) value[i];
-    }
-    return res;
-  }
-
-  private static HashMap<Integer, HashMap<String, HashMap<String, int[]>>> loadBehaviorData(
+  private static HashMap<String, HashMap<Integer, HashMap<String, HashMap<String, double[]>>>> loadBehaviorData(
       String preDataFname) {
 
-    HashMap<Integer, HashMap<String, HashMap<String, int[]>>> res = new HashMap<Integer, HashMap<String, HashMap<String, int[]>>>();
+    HashMap<String, HashMap<Integer, HashMap<String, HashMap<String, double[]>>>> res = new HashMap<String, HashMap<Integer, HashMap<String, HashMap<String, double[]>>>>();
 
     try {
       BufferedReader bw = new BufferedReader(new FileReader(new File(preDataFname)));
       bw.readLine();
       String str = null;
-      while (null != (str = bw.readLine()) && str.replaceAll("\\s+", "").length() > 0) {
+      while (null != (str = bw.readLine()) && str.trim().length() > 0) {
 
-        String[] strSplit = str.trim().split("\t");
+        String[] strSplit = str.trim().split(", ");
 
-        // release_id tag id email start end V1 V2 V3 V4 V5 V6 V7
-        int release_id = Integer.valueOf(strSplit[0]).intValue();
-        String tag = strSplit[1].trim();
-        int author_id = Integer.valueOf(strSplit[2].trim()).intValue();
-        String email = strSplit[3].trim();
-        DateTime start = fmt.withZoneUTC().parseDateTime(strSplit[4].trim());
-        DateTime end = fmt.withZoneUTC().parseDateTime(strSplit[5].trim());
-        int[] data = new int[7];
-        for (int i = 0; i < 7; i++) {
-          data[i] = Integer.valueOf(strSplit[6 + i].trim()).intValue();
+        // post_Android 1.0, 1-post, bzolnier@gmail.com, 2008-09-29T00:00:00.000+02:00,
+        // 2008-10-27T00:00:00.000+01:00, 0.0
+        String release_key = strSplit[1].substring(strSplit[1].indexOf('-') + 1);
+        Integer release_id = Integer.valueOf(strSplit[1].substring(0, strSplit[1].indexOf('-')));
+        String email = strSplit[2].trim();
+        DateTime start = fmt.withZoneUTC().parseDateTime(strSplit[3].trim());
+        DateTime end = fmt.withZoneUTC().parseDateTime(strSplit[4].trim());
+
+        String[] arraySplit = strSplit[5].trim().split("\\s+");
+        double[] data = new double[arraySplit.length];
+        for (int i = 0; i < arraySplit.length; i++) {
+          data[i] = Double.valueOf(arraySplit[i].trim()).doubleValue();
         }
 
-        if (!(res.containsKey(release_id))) {
-          res.put(release_id, new HashMap<String, HashMap<String, int[]>>());
+        if (!(res.containsKey(release_key))) {
+          res.put(release_key, new HashMap<Integer, HashMap<String, HashMap<String, double[]>>>());
         }
-        HashMap<String, HashMap<String, int[]>> pointer = res.get(release_id);
+        HashMap<Integer, HashMap<String, HashMap<String, double[]>>> pointer = res.get(release_key);
 
-        if (!(pointer.containsKey(tag))) {
-          pointer.put(tag, new HashMap<String, int[]>());
+        if (!(pointer.containsKey(release_id))) {
+          pointer.put(release_id, new HashMap<String, HashMap<String, double[]>>());
         }
-        HashMap<String, int[]> pointer2 = pointer.get(tag);
+        HashMap<String, HashMap<String, double[]>> pointer2 = pointer.get(release_id);
 
-        pointer2.put(String.valueOf(author_id) + start.toString(), data);
+        if (!(pointer.containsKey(email))) {
+          pointer2.put(email, new HashMap<String, double[]>());
+        }
+        HashMap<String, double[]> pointer3 = pointer2.get(email);
+
+        pointer3.put(start.toString() + "_" + end.toString(), data);
 
       }
       bw.close();

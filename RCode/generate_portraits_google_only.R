@@ -14,7 +14,7 @@ con <- dbConnect(MySQL(), user="omap", password="omap", dbname="android", host="
 #
 # dates business
 releases=read.table("../data/android_releases_major.csv",as.is=T,header=F)
-names(releases)=c("date","release")
+names(releases)=c("index","date","release")
 str(releases)
 releases$date=as.POSIXct(releases$date)
 
@@ -150,7 +150,7 @@ write.table(post_res,file="post_portraits_weekly_google.txt", quote=F, col.names
 #
 dt = as.Date("2013-02-04")
 pre_res=data.frame(release_id=7,tag="pre",id=7377,email="dimitrysh@google.com",start=as.Date("2013-02-03"),end=as.Date("2013-02-10"))
-pre_res=cbind(pre_res,as.data.frame(t(get_series(7377,dt,dt+as.difftime(4, unit="weeks")-as.difftime(1, unit="days")))))
+pre_res=cbind(pre_res,as.data.frame(t(get_series(7377,dt,dt+as.difftime(4, unit="weeks")))))
 
 post_res=pre_res
 
@@ -160,20 +160,20 @@ for(k in c(1:(length(releases$date)))){
   dt <- as.Date(releases[k,]$date)
   release_monday=monday_for_a_date(dt) 
   monday_before =release_monday-as.difftime(4, unit="weeks")
-  monday_after  =release_monday+as.difftime(4, unit="weeks")
+  monday_after  =release_monday+as.difftime(1, unit="weeks")
   print(paste("release monday", release_monday, "monday pre", monday_before, "monday post ", monday_after))
   # month starts
-    new.dt_pre_start  <- monday_before - as.difftime(4, unit="weeks")
-    new.dt_pre_end    <- monday_before - as.difftime(1, unit="days")
+    new.dt_pre_start  <- monday_before
+    new.dt_pre_end    <- monday_before + as.difftime(4, unit="weeks")
     new.dt_post_start <- monday_after
-    new.dt_post_end   <- monday_after + as.difftime(4, unit="weeks") - as.difftime(1, unit="days")
-    print(paste(new.dt_post_start, new.dt_post_end))
+    new.dt_post_end   <- monday_after + as.difftime(4, unit="weeks")
+    print(paste(new.dt_pre_start, new.dt_pre_end))
     # PRE-RELEASE
     # users
     users=dbGetQuery(con, 
         paste("select distinct(c.author_id), cp.email from android.android_change c ",
         "join android.change_people cp on c.author_id=cp.id ",
-        "where cp.email like \"%google.com\" and  c.added_lines>0 and ",                 
+        "where cp.email like \"%google.com\" and c.added_lines>0 and ",                 
         "c.project_id=18 and DATE_FORMAT(c.author_date, \"%Y-%m-%d\") between ",
         shQuote(new.dt_pre_start), " and ", shQuote(new.dt_pre_end),
         sep=""))
@@ -190,6 +190,7 @@ for(k in c(1:(length(releases$date)))){
     }
     # POST-RELEASE
     # users
+    print(paste(new.dt_post_start, new.dt_post_end))
     users=dbGetQuery(con, 
         paste("select distinct(c.author_id), cp.email from android.android_change c ",
         "join android.change_people cp on c.author_id=cp.id ",                 

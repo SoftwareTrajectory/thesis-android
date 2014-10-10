@@ -15,8 +15,6 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import edu.hawaii.senin.trajectory.android.builder.SingleDayRecord;
-import edu.hawaii.senin.trajectory.android.persistence.Change;
 import edu.hawaii.senin.trajectory.android.persistence.ChangePeople;
 import edu.hawaii.senin.trajectory.android.persistence.ChangeProject;
 
