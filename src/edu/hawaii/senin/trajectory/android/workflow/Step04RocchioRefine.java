@@ -1,8 +1,5 @@
 package edu.hawaii.senin.trajectory.android.workflow;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,28 +13,23 @@ import edu.hawaii.jmotif.saxvsm.UCRUtils;
 import edu.hawaii.jmotif.text.SAXCollectionStrategy;
 import edu.hawaii.jmotif.text.TextUtils;
 import edu.hawaii.jmotif.text.WordBag;
-import edu.hawaii.jmotif.text.cluster.RandomStartStrategy;
-import edu.hawaii.jmotif.text.cluster.TextKMeans;
 import edu.hawaii.jmotif.timeseries.TSException;
 
-public class Step04ClusterRelease {
+public class Step04RocchioRefine {
 
   // data
   //
-  private static final String TRAINING_DATA = "results/135_el_train.csv";
+  private static final String TRAINING_DATA = "results/test-target.csv";
 
   // prefix for all of the output
   private static final String PREFIX = "/home/psenin/dendroscope/";
 
   // SAX parameters to use
   //
-  private static final int WINDOW_SIZE = 24;
-  private static final int PAA_SIZE = 5;
+  private static final int WINDOW_SIZE = 21;
+  private static final int PAA_SIZE = 10;
   private static final int ALPHABET_SIZE = 12;
-  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.CLASSIC;
-
-  private static final String OUT0_FILENAME = "results/135_vector0.csv";
-  private static final String OUT1_FILENAME = "results/135_vector1.csv";
+  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.EXACT;
 
   // logger business
   private static Logger consoleLogger;
@@ -90,37 +82,13 @@ public class Step04ClusterRelease {
     // create the TFIDF data structure
     HashMap<String, HashMap<String, Double>> tfidf = TextUtils.computeTFIDF(bags);
     tfidf = TextUtils.normalizeToUnitVectors(tfidf);
-    System.out.println(TextUtils.tfidfToTable(tfidf));
+    // System.out.println(TextUtils.tfidfToTable(tfidf));
 
-    // launch HC to see the dendogram
-    // Cluster clusters = HC.Hc(tfidf, LinkageCriterion.COMPLETE);
-    // System.out.println((new CosineDistanceMatrix(tfidf)).toString());
-    // BufferedWriter bw = new BufferedWriter(new FileWriter(PREFIX + "test2.newick"));
-    // bw.write("(" + clusters.toNewick() + ")");
-    // bw.close();
+    // the cluster centroids
+    HashMap<String, HashMap<String, Double>> centroids = new HashMap<String, HashMap<String, Double>>();
 
-    // launch KMeans with random centers
-    @SuppressWarnings("unused")
-    HashMap<String, List<String>> clustersK = TextKMeans.cluster(tfidf, 2,
-        new RandomStartStrategy());
-
-    HashMap<String, Double> vector1 = TextKMeans.computeCentroid(tfidf, clustersK.get("0"));
-    saveWeightVector(vector1, OUT0_FILENAME);
-
-    HashMap<String, Double> vector2 = TextKMeans.computeCentroid(tfidf, clustersK.get("1"));
-    saveWeightVector(vector2, OUT1_FILENAME);
-
-    // write down tf*idf vectors for each class
-    // writePreClusterTable(tfidf, PREFIX + "cylinder-bell-funnel.csv");
-  }
-
-  private static void saveWeightVector(HashMap<String, Double> vector, String fname)
-      throws IOException {
-    BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fname)));
-    for (Entry<String, Double> e : vector.entrySet()) {
-      bw.write(e.getKey() + " " + e.getValue() + "\n");
-    }
-    bw.close();
+    //
+    //
   }
 
 }

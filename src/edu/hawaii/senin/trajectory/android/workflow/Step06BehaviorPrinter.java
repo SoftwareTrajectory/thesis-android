@@ -1,28 +1,48 @@
 package edu.hawaii.senin.trajectory.android.workflow;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import edu.hawaii.jmotif.sax.alphabet.NormalAlphabet;
+import edu.hawaii.jmotif.text.SAXCollectionStrategy;
+import edu.hawaii.jmotif.text.TextUtils;
 import edu.hawaii.jmotif.text.WordBag;
 import edu.hawaii.jmotif.timeseries.TSException;
-import edu.hawaii.jmotif.timeseries.TSUtils;
 
-public class WeightVectorsMaker {
+/**
+ * This takes the full format of trajectories and creates a UCR-formatted file suitable for DIRECT
+ * optimization.
+ * 
+ * @author psenin
+ * 
+ */
+public class Step06BehaviorPrinter {
 
-  private static final String PRE_DATA_FNAME = "results/release_28_added_lines.csv";
+  private static final String IN_DATA_FNAME = "results/release_28_added_lines.csv";
 
-  private static final int[] RELEASES_OF_INTEREST = { 1, 3, 5 };
+  private static final int[] RELEASES_OF_INTEREST = { 2 };
+
+  private static final String[] PRE_PATTERNS = { "leeeeegfee" };
+
+  private static final String[] POST_PATTERNS = { "efeeleeeee" };
+
+  // SAX parameters to use
+  //
+  private static final int WINDOW_SIZE = 21;
+  private static final int PAA_SIZE = 10;
+  private static final int ALPHABET_SIZE = 12;
+  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.EXACT;
 
   private static Logger consoleLogger;
   private static Level LOGGING_LEVEL = Level.INFO;
@@ -30,66 +50,73 @@ public class WeightVectorsMaker {
   private static final DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
 
   static {
-    consoleLogger = (Logger) LoggerFactory.getLogger(WeightVectorsMaker.class);
+    consoleLogger = (Logger) LoggerFactory.getLogger(Step06BehaviorPrinter.class);
     consoleLogger.setLevel(LOGGING_LEVEL);
   }
 
-  public static void main(String[] args) throws TSException {
+  public static void main(String[] args) throws TSException, IOException {
+
+    int[][] params = new int[1][4];
+    params[0][0] = WINDOW_SIZE;
+    params[0][1] = PAA_SIZE;
+    params[0][2] = ALPHABET_SIZE;
+    params[0][3] = STRATEGY.index();
 
     // "pre" or "post"
     // "release numeric ID"
     // "email, dates"
     // metrics
-    HashMap<String, HashMap<Integer, HashMap<String, HashMap<String, double[]>>>> data = loadBehaviorData(PRE_DATA_FNAME);
+    HashMap<String, HashMap<Integer, HashMap<String, HashMap<String, double[]>>>> data = loadBehaviorData(IN_DATA_FNAME);
 
-    ArrayList<WordBag> bags = new ArrayList<WordBag>();
+    { // PRE-hunter
+      HashMap<Integer, HashMap<String, HashMap<String, double[]>>> pre = data.get("pre");
+      for (Entry<Integer, HashMap<String, HashMap<String, double[]>>> e : pre.entrySet()) {
 
-    for (int rId : RELEASES_OF_INTEREST) {
+        Integer release_id = e.getKey();
+        if (contains(RELEASES_OF_INTEREST, release_id)) {
 
-      HashMap<String, HashMap<String, double[]>> pre = data.get("pre").get(rId);
-      WordBag wb = new WordBag("pre-" + rId);
-
-      Collection<HashMap<String, double[]>> preArrays = pre.values();
-      for (HashMap<String, double[]> e : preArrays) {
-        for (double[] dd : e.values()) {
-          String word = toSAX(dd, 7, 4, 3);
-          wb.addWord(word);
+          for (HashMap<String, double[]> e1 : e.getValue().values()) {
+            for (Entry<String, double[]> e3 : e1.entrySet()) {
+              WordBag tmp = TextUtils.seriesToWordBag("tmp", e3.getValue(), params[0]);
+              if (tmp.contains(PRE_PATTERNS[0])) {
+                System.out.println("pre, " + e3.getKey() + ", " + Arrays.toString(e3.getValue()));
+              }
+            }
+          }
         }
+
       }
-      consoleLogger.info("  pre-release arrays: " + preArrays.size());
-
-      bags.add(wb);
-      //
-      // HashMap<String, int[]> postArrays = dataPostRelease.get(rr.getId()).get("post");
-      // consoleLogger.info("  post-release arrays: " + postArrays.size());
-      // WordBag wb2 = new WordBag("post-" + rr.getId());
-      // for (Entry<String, int[]> e : postArrays.entrySet()) {
-      // String word = toSAX(toDoubles(e.getValue()), 7, 4, 3);
-      // wb2.addWord(word);
-      // }
-      // consoleLogger.info("    wordbag: " + wb.toString().replace("\n", ", "));
-      // bags.add(wb2);
-      // }
-      //
-      // HashMap<String, HashMap<String, Double>> tfidf = TextUtils.computeTFIDF(bags);
-      //
-      // System.out.println(TextUtils.tfidfToTable(tfidf));DateTime
-
     }
+
+    {
+      HashMap<Integer, HashMap<String, HashMap<String, double[]>>> post = data.get("post");
+      for (Entry<Integer, HashMap<String, HashMap<String, double[]>>> e : post.entrySet()) {
+
+        Integer release_id = e.getKey();
+        if (contains(RELEASES_OF_INTEREST, release_id)) {
+
+          for (HashMap<String, double[]> e1 : e.getValue().values()) {
+            for (Entry<String, double[]> e3 : e1.entrySet()) {
+              WordBag tmp = TextUtils.seriesToWordBag("tmp", e3.getValue(), params[0]);
+              if (tmp.contains(POST_PATTERNS[0])) {
+                System.out.println("post, " + e3.getKey() + ", " + Arrays.toString(e3.getValue()));
+              }
+            }
+          }
+        }
+
+      }
+    }
+
   }
 
-  private static String toSAX(double[] ts, int slidingWindowSize, int paaSize, int alphabetSize)
-      throws TSException {
-
-    NormalAlphabet normalA = new NormalAlphabet();
-
-    if (TSUtils.stDev(ts) > 0.5) {
-      ts = TSUtils.zNormalize(ts);
+  private static boolean contains(int[] releasesOfInterest, Integer release_id) {
+    for (int i : releasesOfInterest) {
+      if (release_id.equals(Integer.valueOf(i))) {
+        return true;
+      }
     }
-    double[] paa = TSUtils.optimizedPaa(ts, paaSize);
-    char[] currentString = TSUtils.ts2String(paa, normalA.getCuts(alphabetSize));
-
-    return String.valueOf(currentString);
+    return false;
   }
 
   private static HashMap<String, HashMap<Integer, HashMap<String, HashMap<String, double[]>>>> loadBehaviorData(

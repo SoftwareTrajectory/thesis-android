@@ -25,6 +25,8 @@ import edu.hawaii.jmotif.text.SAXCollectionStrategy;
 import edu.hawaii.jmotif.util.StackTrace;
 
 /**
+ * This samples parameters finding the optimal set.
+ * 
  * @author psenin
  * 
  */
@@ -36,7 +38,7 @@ public class Step03OMAPDirectSampler extends UCRGenericClassifier {
 
   // data
   //
-  private static final String TRAINING_DATA = "results/test.csv";
+  private static final String TRAINING_DATA = "results/135_el_train.csv";
 
   // output prefix
   //
@@ -48,14 +50,14 @@ public class Step03OMAPDirectSampler extends UCRGenericClassifier {
   private static final int WINDOW_MAX = 28;
 
   private static final int PAA_MIN = 3;
-  private static final int PAA_MAX = 16;
+  private static final int PAA_MAX = 15;
 
   private static final int ALPHABET_MIN = 3;
-  private static final int ALPHABET_MAX = 16;
+  private static final int ALPHABET_MAX = 15;
 
   private static final int HOLD_OUT_NUM = 100;
 
-  private static final int MAX_ITERATIONS = 16;
+  private static final int MAX_ITERATIONS = 11;
 
   private static List<String> globalResults = new ArrayList<String>();
 
@@ -70,6 +72,8 @@ public class Step03OMAPDirectSampler extends UCRGenericClassifier {
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
 
+    // read the data and print stats
+    //
     Map<String, List<double[]>> trainData = UCRUtils.readUCRData(TRAINING_DATA);
     consoleLogger.info("reading file: " + TRAINING_DATA);
     consoleLogger.info("trainData classes: " + trainData.size() + ", series length: "
@@ -78,11 +82,15 @@ public class Step03OMAPDirectSampler extends UCRGenericClassifier {
       consoleLogger.info(" training class: " + e.getKey() + " series: " + e.getValue().size());
     }
 
+    // optimizer needs to know parameters range
+    //
     double[] parametersLowest = { Double.valueOf(WINDOW_MIN), Double.valueOf(PAA_MIN),
         Double.valueOf(ALPHABET_MIN) };
     double[] parametersHighest = { Double.valueOf(WINDOW_MAX), Double.valueOf(PAA_MAX),
         Double.valueOf(ALPHABET_MAX) };
 
+    // we want to run three samplers in parellel
+    //
     ExecutorService executorService = Executors.newFixedThreadPool(THREADS_NUM);
     CompletionService<List<String>> completionService = new ExecutorCompletionService<List<String>>(
         executorService);

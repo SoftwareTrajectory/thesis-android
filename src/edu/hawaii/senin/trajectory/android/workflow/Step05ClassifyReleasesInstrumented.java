@@ -21,7 +21,7 @@ import edu.hawaii.jmotif.text.TextUtils;
 import edu.hawaii.jmotif.text.WordBag;
 import edu.hawaii.jmotif.timeseries.TSException;
 
-public class Step05ClassifyReleases {
+public class Step05ClassifyReleasesInstrumented {
 
   private static final DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
 
@@ -30,15 +30,15 @@ public class Step05ClassifyReleases {
 
   // SAX parameters to use
   //
-  private static final int WINDOW_SIZE = 24;
-  private static final int PAA_SIZE = 5;
+  private static final int WINDOW_SIZE = 21;
+  private static final int PAA_SIZE = 10;
   private static final int ALPHABET_SIZE = 12;
-  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.CLASSIC;
+  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.EXACT;
 
   private static final String IN_DATA_FNAME = "results/release_28_added_lines.csv";
 
-  private static final String PRE_CLASS = "results/135_vector0.csv";
-  private static final String POST_CLASS = "results/135_vector1.csv";
+  private static final String PRE_CLASS = "results/pre_words.csv";
+  private static final String POST_CLASS = "results/post_words.csv";
 
   // logger business
   private static Logger consoleLogger;
@@ -91,8 +91,16 @@ public class Step05ClassifyReleases {
           }
         }
 
-        double preCosine = TextUtils.cosineSimilarity(preBag, preVector);
-        double postCosine = TextUtils.cosineSimilarity(preBag, postVector);
+        HashMap<String, Double> insight = new HashMap<String, Double>();
+        double preCosine = TextUtils.cosineSimilarityInstrumented(preBag, preVector, insight);
+        if (2 == release_id) {
+          for (Entry<String, Double> entry : insight.entrySet()) {
+            System.out.println(entry.getKey() + " " + df.format(entry.getValue()));
+          }
+        }
+
+        insight = new HashMap<String, Double>();
+        double postCosine = TextUtils.cosineSimilarityInstrumented(preBag, postVector, insight);
 
         String res = "misclassified";
         if (preCosine > postCosine) {
@@ -123,8 +131,16 @@ public class Step05ClassifyReleases {
           }
         }
 
-        double preCosine = TextUtils.cosineSimilarity(preBag, preVector);
-        double postCosine = TextUtils.cosineSimilarity(preBag, postVector);
+        HashMap<String, Double> insight = new HashMap<String, Double>();
+        double preCosine = TextUtils.cosineSimilarityInstrumented(preBag, preVector, insight);
+
+        insight = new HashMap<String, Double>();
+        double postCosine = TextUtils.cosineSimilarityInstrumented(preBag, postVector, insight);
+        if (2 == release_id) {
+          for (Entry<String, Double> entry : insight.entrySet()) {
+            System.out.println(entry.getKey() + " " + df.format(entry.getValue()));
+          }
+        }
 
         String res = "misclassified";
         if (postCosine > preCosine) {

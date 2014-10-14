@@ -1,9 +1,7 @@
 package edu.hawaii.senin.trajectory.android.workflow;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
@@ -30,7 +28,7 @@ import edu.hawaii.senin.trajectory.android.util.AndroidEvolution;
 import edu.hawaii.senin.trajectory.android.util.MapEntry;
 
 /**
- * The first step of the SAT workflow, prints software trajectories.
+ * The first step of the STA workflow, prints software trajectories.
  * 
  * @author psenin
  * 
@@ -47,7 +45,7 @@ public class Step01PrintReleaseSeries {
 
   // this is the set of metrics we'll be retrieving data for
   //
-  private static final String[] METRICS_OF_INTEREST = { "added_files" };
+  private static final String[] METRICS_OF_INTEREST = { "added_lines" };
   // , "edited_files",
   // "removed_files", "added_lines", "edited_lines", "removed_lines" };
 
@@ -139,9 +137,8 @@ public class Step01PrintReleaseSeries {
             if (TSUtils.mean(series) == 0d) {
               continue;
             }
-            System.out.println("# " + counter + ", " + s + "-post, " + cp.getEmail() + ", "
-                + postReleaseStartMonday + ", " + postReleaseStartMonday.plusDays(DAYS) + ", "
-                + Arrays.toString(series));
+            System.out.println("# " + counter + ", " + s + "-post, " + cp.getEmail() + ", " + start
+                + ", " + end + ", " + Arrays.toString(series));
             postRelease.add(new MapEntry<String, double[]>(s + ", " + counter + "-post, "
                 + cp.getEmail() + ", " + postReleaseStartMonday + ", "
                 + postReleaseStartMonday.plusDays(DAYS), series));
@@ -167,9 +164,8 @@ public class Step01PrintReleaseSeries {
             if (TSUtils.mean(series) == 0d) {
               continue;
             }
-            System.out.println("# " + counter + ", " + s + "-pre, " + cp.getEmail() + ", "
-                + postReleaseStartMonday + ", " + postReleaseStartMonday.plusDays(DAYS) + ", "
-                + Arrays.toString(series));
+            System.out.println("# " + counter + ", " + s + "-pre, " + cp.getEmail() + ", " + start
+                + ", " + end + ", " + Arrays.toString(series));
             postRelease.add(new MapEntry<String, double[]>(s + ", " + counter + "-pre, "
                 + cp.getEmail() + ", " + postReleaseStartMonday + ", "
                 + postReleaseStartMonday.plusDays(DAYS), series));
@@ -185,6 +181,14 @@ public class Step01PrintReleaseSeries {
 
   }
 
+  /**
+   * Saves the data set.
+   * 
+   * @param preRelease
+   * @param postRelease
+   * @param outputPrefix
+   * @throws IOException
+   */
   private static void saveSet(ArrayList<Entry<String, double[]>> preRelease,
       ArrayList<Entry<String, double[]>> postRelease, String outputPrefix) throws IOException {
 
@@ -209,39 +213,4 @@ public class Step01PrintReleaseSeries {
     bw.close();
   }
 
-  private static double[] processPeaks(double[] sumSeries) {
-    double mean = TSUtils.mean(sumSeries);
-    double sd = TSUtils.stDev(sumSeries);
-    for (int i = 0; i < sumSeries.length; i++) {
-      if (sumSeries[i] > 2. * sd) {
-        sumSeries[i] = 2. * sd;
-      }
-    }
-    return sumSeries;
-  }
-
-  private static double[] sumSeries(double[] sumSeries, double[] series) {
-    for (int i = 0; i < sumSeries.length; i++) {
-      sumSeries[i] = sumSeries[i] + series[i];
-    }
-    return sumSeries;
-  }
-
-  private static ArrayList<String[]> readCSV(String fname) throws IOException {
-    ArrayList<String[]> res = new ArrayList<String[]>();
-    String line = null;
-    BufferedReader br = new BufferedReader(new FileReader(new File(fname)));
-    while ((line = br.readLine()) != null) {
-      String[] r = line.split("\\s*,\\s*");
-      res.add(line.split("\\s*,\\s*"));
-    }
-    return res;
-  }
-
-  private static double sum(double[] changeLinesSeries) {
-    double sum = 0;
-    for (double i : changeLinesSeries)
-      sum += i;
-    return sum;
-  }
 }

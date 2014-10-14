@@ -17,13 +17,22 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import edu.hawaii.jmotif.timeseries.TSException;
 
+/**
+ * This takes the full format of trajectories and creates a UCR-formatted file suitable for DIRECT
+ * optimization.
+ * 
+ * @author psenin
+ * 
+ */
 public class Step02WriteUCRFormat {
 
   private static final String IN_DATA_FNAME = "results/release_28_added_lines.csv";
 
-  private static final String OUT_FNAME = "results/test.csv";
+  private static final String OUT_FNAME = "results/135_el_train.csv";
 
-  private static final int[] RELEASES_OF_INTEREST = { 1, 3, 5 };
+  private static final String OUT_OTHER_FNAME = "results/135_el_test.csv";
+
+  private static final int[] RELEASES_OF_INTEREST = { 2, 4, 6 };
 
   private static Logger consoleLogger;
   private static Level LOGGING_LEVEL = Level.INFO;
@@ -44,15 +53,25 @@ public class Step02WriteUCRFormat {
     HashMap<String, HashMap<Integer, HashMap<String, HashMap<String, double[]>>>> data = loadBehaviorData(IN_DATA_FNAME);
 
     BufferedWriter bw = new BufferedWriter(new FileWriter(new File(OUT_FNAME)));
+    BufferedWriter bw_other = new BufferedWriter(new FileWriter(new File(OUT_OTHER_FNAME)));
 
     {
       HashMap<Integer, HashMap<String, HashMap<String, double[]>>> pre = data.get("pre");
       for (Entry<Integer, HashMap<String, HashMap<String, double[]>>> e : pre.entrySet()) {
+        System.out.println("pre-" + e.getKey() + ", " + e.getValue().size());
         Integer release_id = e.getKey();
         if (contains(RELEASES_OF_INTEREST, release_id)) {
           for (HashMap<String, double[]> e1 : e.getValue().values()) {
             for (double[] dd : e1.values()) {
               bw.write("pre-" + release_id + " "
+                  + Arrays.toString(dd).replace("[", "").replace("]", "").replace(",", "") + "\n");
+            }
+          }
+        }
+        else {
+          for (HashMap<String, double[]> e1 : e.getValue().values()) {
+            for (double[] dd : e1.values()) {
+              bw_other.write("pre-" + release_id + " "
                   + Arrays.toString(dd).replace("[", "").replace("]", "").replace(",", "") + "\n");
             }
           }
@@ -63,6 +82,7 @@ public class Step02WriteUCRFormat {
     {
       HashMap<Integer, HashMap<String, HashMap<String, double[]>>> post = data.get("post");
       for (Entry<Integer, HashMap<String, HashMap<String, double[]>>> e : post.entrySet()) {
+        System.out.println("post-" + e.getKey() + ", " + e.getValue().size());
         Integer release_id = e.getKey();
         if (contains(RELEASES_OF_INTEREST, release_id)) {
           for (HashMap<String, double[]> e1 : e.getValue().values()) {
@@ -72,10 +92,19 @@ public class Step02WriteUCRFormat {
             }
           }
         }
+        else {
+          for (HashMap<String, double[]> e1 : e.getValue().values()) {
+            for (double[] dd : e1.values()) {
+              bw_other.write("pre-" + release_id + " "
+                  + Arrays.toString(dd).replace("[", "").replace("]", "").replace(",", "") + "\n");
+            }
+          }
+        }
       }
     }
 
     bw.close();
+    bw_other.close();
 
   }
 
