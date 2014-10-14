@@ -46,18 +46,18 @@ public class Step03OMAPDirectSampler extends UCRGenericClassifier {
 
   // SAX parameters to use
   //
-  private static final int WINDOW_MIN = 3;
+  private static final int WINDOW_MIN = 2;
   private static final int WINDOW_MAX = 28;
 
   private static final int PAA_MIN = 3;
-  private static final int PAA_MAX = 15;
+  private static final int PAA_MAX = 16;
 
   private static final int ALPHABET_MIN = 3;
-  private static final int ALPHABET_MAX = 15;
+  private static final int ALPHABET_MAX = 16;
 
-  private static final int HOLD_OUT_NUM = 100;
+  private static final int HOLD_OUT_NUM = 60;
 
-  private static final int MAX_ITERATIONS = 11;
+  private static final int MAX_ITERATIONS = 16;
 
   private static List<String> globalResults = new ArrayList<String>();
 

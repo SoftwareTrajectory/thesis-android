@@ -31,10 +31,10 @@ public class Step04ClusterRelease {
 
   // SAX parameters to use
   //
-  private static final int WINDOW_SIZE = 24;
-  private static final int PAA_SIZE = 5;
-  private static final int ALPHABET_SIZE = 12;
-  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.CLASSIC;
+  public static final int WINDOW_SIZE = 24;
+  public static final int PAA_SIZE = 5;
+  public static final int ALPHABET_SIZE = 7;
+  public static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.CLASSIC;
 
   private static final String OUT0_FILENAME = "results/135_vector0.csv";
   private static final String OUT1_FILENAME = "results/135_vector1.csv";

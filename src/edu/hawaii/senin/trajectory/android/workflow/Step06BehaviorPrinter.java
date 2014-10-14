@@ -1,10 +1,8 @@
 package edu.hawaii.senin.trajectory.android.workflow;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,25 +27,25 @@ import edu.hawaii.jmotif.timeseries.TSException;
  */
 public class Step06BehaviorPrinter {
 
-  private static final String IN_DATA_FNAME = "results/release_28_added_lines.csv";
+  private static final String IN_DATA_FNAME = "results/release_28_removed_lines.csv";
 
-  private static final int[] RELEASES_OF_INTEREST = { 2 };
+  private static final int[] RELEASES_OF_INTEREST = { 1, 3, 4, 8, 10, 11, 12 };
 
-  private static final String[] PRE_PATTERNS = { "leeeeegfee" };
+  private static final String[] PRE_PATTERNS = { "ebbbebbbbbbb" };
 
-  private static final String[] POST_PATTERNS = { "efeeleeeee" };
+  private static final String[] POST_PATTERNS = { "edbbbbbbbbbb" };
 
   // SAX parameters to use
   //
-  private static final int WINDOW_SIZE = 21;
-  private static final int PAA_SIZE = 10;
-  private static final int ALPHABET_SIZE = 12;
-  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.EXACT;
+  private static final int WINDOW_SIZE = 12;
+  private static final int PAA_SIZE = 12;
+  private static final int ALPHABET_SIZE = 5;
+  private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.CLASSIC;
 
   private static Logger consoleLogger;
   private static Level LOGGING_LEVEL = Level.INFO;
 
-  private static final DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+  private static final DateTimeFormatter fmt = ISODateTimeFormat.dateHourMinuteSecondMillis();
 
   static {
     consoleLogger = (Logger) LoggerFactory.getLogger(Step06BehaviorPrinter.class);
@@ -79,7 +77,8 @@ public class Step06BehaviorPrinter {
             for (Entry<String, double[]> e3 : e1.entrySet()) {
               WordBag tmp = TextUtils.seriesToWordBag("tmp", e3.getValue(), params[0]);
               if (tmp.contains(PRE_PATTERNS[0])) {
-                System.out.println("pre, " + e3.getKey() + ", " + Arrays.toString(e3.getValue()));
+                System.out.println("pre, " + e3.getKey() + ", "
+                    + Arrays.toString(e3.getValue()).replace(",", ""));
               }
             }
           }
@@ -99,7 +98,8 @@ public class Step06BehaviorPrinter {
             for (Entry<String, double[]> e3 : e1.entrySet()) {
               WordBag tmp = TextUtils.seriesToWordBag("tmp", e3.getValue(), params[0]);
               if (tmp.contains(POST_PATTERNS[0])) {
-                System.out.println("post, " + e3.getKey() + ", " + Arrays.toString(e3.getValue()));
+                System.out.println("post, " + e3.getKey() + ", "
+                    + Arrays.toString(e3.getValue()).replace(",", ""));
               }
             }
           }

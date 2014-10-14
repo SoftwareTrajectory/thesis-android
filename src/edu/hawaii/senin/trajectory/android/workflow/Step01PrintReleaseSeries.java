@@ -45,9 +45,8 @@ public class Step01PrintReleaseSeries {
 
   // this is the set of metrics we'll be retrieving data for
   //
-  private static final String[] METRICS_OF_INTEREST = { "added_lines" };
-  // , "edited_files",
-  // "removed_files", "added_lines", "edited_lines", "removed_lines" };
+  private static final String[] METRICS_OF_INTEREST = { "added_lines", "edited_lines",
+      "removed_lines", "added_files", "edited_files", "removed_files" };
 
   // this is the output prefix
   //
@@ -109,10 +108,9 @@ public class Step01PrintReleaseSeries {
       int counter = 1;
       for (DateTime releaseDate : myDates) {
 
+        // makeup dates
         String s = releases.get(releaseDate);
 
-        // dates business
-        //
         DateTime releaseMonday = releaseDate.withDayOfWeek(DateTimeConstants.MONDAY);
 
         DateTime postReleaseStartMonday = releaseMonday.plusDays(7);
@@ -140,8 +138,7 @@ public class Step01PrintReleaseSeries {
             System.out.println("# " + counter + ", " + s + "-post, " + cp.getEmail() + ", " + start
                 + ", " + end + ", " + Arrays.toString(series));
             postRelease.add(new MapEntry<String, double[]>(s + ", " + counter + "-post, "
-                + cp.getEmail() + ", " + postReleaseStartMonday + ", "
-                + postReleaseStartMonday.plusDays(DAYS), series));
+                + cp.getEmail() + ", " + start + ", " + end, series));
           }
 
         }
@@ -166,9 +163,8 @@ public class Step01PrintReleaseSeries {
             }
             System.out.println("# " + counter + ", " + s + "-pre, " + cp.getEmail() + ", " + start
                 + ", " + end + ", " + Arrays.toString(series));
-            postRelease.add(new MapEntry<String, double[]>(s + ", " + counter + "-pre, "
-                + cp.getEmail() + ", " + postReleaseStartMonday + ", "
-                + postReleaseStartMonday.plusDays(DAYS), series));
+            preRelease.add(new MapEntry<String, double[]>(s + ", " + counter + "-pre, "
+                + cp.getEmail() + ", " + start + ", " + end, series));
           }
         }
 

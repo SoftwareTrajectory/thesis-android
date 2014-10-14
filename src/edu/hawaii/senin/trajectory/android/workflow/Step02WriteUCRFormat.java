@@ -26,18 +26,18 @@ import edu.hawaii.jmotif.timeseries.TSException;
  */
 public class Step02WriteUCRFormat {
 
-  private static final String IN_DATA_FNAME = "results/release_28_added_lines.csv";
+  private static final String IN_DATA_FNAME = "results/release_28_removed_lines.csv";
 
   private static final String OUT_FNAME = "results/135_el_train.csv";
 
   private static final String OUT_OTHER_FNAME = "results/135_el_test.csv";
 
-  private static final int[] RELEASES_OF_INTEREST = { 2, 4, 6 };
+  private static final int[] RELEASES_OF_INTEREST = { 5,8,11 };
 
   private static Logger consoleLogger;
   private static Level LOGGING_LEVEL = Level.INFO;
 
-  private static final DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+  private static final DateTimeFormatter fmt = ISODateTimeFormat.dateHourMinuteSecondMillis();
 
   static {
     consoleLogger = (Logger) LoggerFactory.getLogger(Step02WriteUCRFormat.class);
@@ -135,8 +135,8 @@ public class Step02WriteUCRFormat {
         String release_key = strSplit[1].substring(strSplit[1].indexOf('-') + 1);
         Integer release_id = Integer.valueOf(strSplit[1].substring(0, strSplit[1].indexOf('-')));
         String email = strSplit[2].trim();
-        DateTime start = fmt.withZoneUTC().parseDateTime(strSplit[3].trim());
-        DateTime end = fmt.withZoneUTC().parseDateTime(strSplit[4].trim());
+        DateTime start = fmt.parseDateTime(strSplit[3].trim());
+        DateTime end = fmt.parseDateTime(strSplit[4].trim());
 
         String[] arraySplit = strSplit[5].trim().split("\\s+");
         double[] data = new double[arraySplit.length];

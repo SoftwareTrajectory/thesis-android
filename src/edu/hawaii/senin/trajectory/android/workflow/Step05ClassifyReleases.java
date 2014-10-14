@@ -23,22 +23,22 @@ import edu.hawaii.jmotif.timeseries.TSException;
 
 public class Step05ClassifyReleases {
 
-  private static final DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+  private static final DateTimeFormatter fmt = ISODateTimeFormat.dateHourMinuteSecondMillis();
 
   private static final DecimalFormat df = (DecimalFormat) NumberFormat
       .getNumberInstance(Locale.FRANCE);
 
   // SAX parameters to use
   //
-  private static final int WINDOW_SIZE = 24;
-  private static final int PAA_SIZE = 5;
-  private static final int ALPHABET_SIZE = 12;
+  private static final int WINDOW_SIZE = 12;
+  private static final int PAA_SIZE = 12;
+  private static final int ALPHABET_SIZE = 5;
   private static final SAXCollectionStrategy STRATEGY = SAXCollectionStrategy.CLASSIC;
 
-  private static final String IN_DATA_FNAME = "results/release_28_added_lines.csv";
+  private static final String IN_DATA_FNAME = "results/release_28_removed_lines.csv";
 
-  private static final String PRE_CLASS = "results/135_vector0.csv";
-  private static final String POST_CLASS = "results/135_vector1.csv";
+  private static final String PRE_CLASS = "results/del_75_pre.csv";
+  private static final String POST_CLASS = "results/del_75_post.csv";
 
   // logger business
   private static Logger consoleLogger;
