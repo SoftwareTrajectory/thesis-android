@@ -29,11 +29,11 @@ public class Step06BehaviorPrinter {
 
   private static final String IN_DATA_FNAME = "results/release_28_removed_lines.csv";
 
-  private static final int[] RELEASES_OF_INTEREST = { 1, 3, 4, 8, 10, 11, 12 };
+  private static final int[] RELEASES_OF_INTEREST = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
 
-  private static final String[] PRE_PATTERNS = { "ebbbebbbbbbb" };
+  private static final String[] PRE_PATTERNS = { "bbbbbcbbbebb" };
 
-  private static final String[] POST_PATTERNS = { "edbbbbbbbbbb" };
+  private static final String[] POST_PATTERNS = { "bbbbbebbcbbb" };
 
   // SAX parameters to use
   //
