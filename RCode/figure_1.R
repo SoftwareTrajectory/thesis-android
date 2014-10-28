@@ -36,7 +36,7 @@ df2 <- melt(dm2)
 df2$variable=rep(c(1:28),each=4)
 p2=ggplot(df2, aes(x=variable,y=value, group=Samples, color=Samples)) + scale_y_log10() + ylab("Deleted LOC") + 
   scale_x_discrete(breaks=seq(0,28,by=7),labels=paste(seq(0,28,by=7))) + xlab("Days") +
-  geom_line(size=2) +  theme_bw() + ggtitle("Pre-release trajectories with best class-characteristic pattern edbbbbbbbbbb") +
+  geom_line(size=2) +  theme_bw() + ggtitle("Post-release trajectories with best class-characteristic pattern edbbbbbbbbbb") +
   theme(legend.position="bottom")
 p2
 #

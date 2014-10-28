@@ -2,12 +2,9 @@ package edu.hawaii.senin.trajectory.android.util;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,6 +35,7 @@ public class AndroidEvolution {
         DateTime date = fmt.parseDateTime(split[1]);
         releases.put(date, name);
       }
+      br.close();
     }
     catch (IOException e) {
       e.printStackTrace();
