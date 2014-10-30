@@ -24,8 +24,8 @@ df <- melt(dm1)
 df$variable=rep(c(1:28),each=4)
 p1=ggplot(df, aes(x=variable,y=value, group=Samples, color=Samples)) + scale_y_log10() + ylab("Deleted LOC") + 
   scale_x_discrete(breaks=seq(0,28,by=7),labels=paste(seq(0,28,by=7))) + xlab("Days") +
-  geom_line(size=2) +  theme_bw() + ggtitle("Pre-release trajectories with best class-characteristic pattern, ebbbebbbbbbb") +
-  theme(legend.position="bottom")
+  geom_line(size=2) +  theme_bw() + ggtitle("Pre-release trajectories with the best\n class-characteristic pattern") +
+  theme(legend.position="bottom",plot.title = element_text(size=20))
 p1
 
 
@@ -36,8 +36,8 @@ df2 <- melt(dm2)
 df2$variable=rep(c(1:28),each=4)
 p2=ggplot(df2, aes(x=variable,y=value, group=Samples, color=Samples)) + scale_y_log10() + ylab("Deleted LOC") + 
   scale_x_discrete(breaks=seq(0,28,by=7),labels=paste(seq(0,28,by=7))) + xlab("Days") +
-  geom_line(size=2) +  theme_bw() + ggtitle("Post-release trajectories with best class-characteristic pattern edbbbbbbbbbb") +
-  theme(legend.position="bottom")
+  geom_line(size=2) +  theme_bw() + ggtitle("Post-release trajectories with the best\n class-characteristic pattern") +
+  theme(legend.position="bottom",plot.title = element_text(size=20))
 p2
 #
 #
@@ -49,8 +49,8 @@ df <- melt(dm1)
 df$variable=rep(c(1:28),each=4)
 p3=ggplot(df, aes(x=variable,y=value, color=Samples)) + scale_y_log10() + ylab("Deleted LOC") + 
   scale_x_discrete(breaks=seq(0,28,by=7),labels=paste(seq(0,28,by=7))) + xlab("Days") +
-  geom_line(size=2) +  theme_bw() + ggtitle("Pre-release trajectories with second best class-characteristic pattern bbbbbcbbbebb") +
-  theme(legend.position="bottom")
+  geom_line(size=2) +  theme_bw() + ggtitle("Pre-release trajectories with second best\n class-characteristic pattern") +
+  theme(legend.position="bottom",plot.title = element_text(size=20))
 p3
 
 
@@ -61,13 +61,13 @@ df2 <- melt(dm2)
 df2$variable=rep(c(1:28),each=4)
 p4=ggplot(df2, aes(x=variable,y=value, group=Samples, color=Samples)) + scale_y_log10() + ylab("Deleted LOC") + 
   scale_x_discrete(breaks=seq(0,28,by=7),labels=paste(seq(0,28,by=7))) + xlab("Days") +
-  geom_line(size=2) +  theme_bw() + ggtitle("Post-release trajectories with second best class-characteristic pattern bbbbbebbcbbb") +
-  theme(legend.position="bottom")
+  geom_line(size=2) +  theme_bw() + ggtitle("Post-release trajectories with second best\n class-characteristic pattern") +
+  theme(legend.position="bottom",plot.title = element_text(size=20))
 p4
 
 print(arrangeGrob(p1, p2, p3, p4, ncol=2))
 
-Cairo(width = 1600, height = 1000, 
+Cairo(width = 1700, height = 1200, 
       file="figures/omap_deleted_lines_patterns_plot.png", 
       type="png", pointsize=9, 
       bg = "transparent", canvas = "white", units = "px", dpi = 82)
